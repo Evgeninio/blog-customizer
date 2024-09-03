@@ -84,10 +84,7 @@
 	"lint-staged": {
 		"*.{css,scss}": "yarn stylelint:fix",
 		"*.{js,jsx,ts,tsx}": "yarn lint",
-		"*.{js,jsx,ts,tsx,json,css,scss,md}": "yarn format",
-		"extends": [
-			"../stories"
-		]
+		"*.{js,jsx,ts,tsx,json,css,scss,md}": "yarn format"
 	},
 	"config": {
 		"commitizen": {
