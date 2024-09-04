@@ -15,68 +15,114 @@ import {
 	OptionType,
 } from 'src/constants/articleProps';
 import { RadioGroup } from '../radio-group';
+import { Dispatch, FormEvent, SetStateAction, useState } from 'react';
+import clsx from 'clsx';
 export type formProps = {
-	fontOptions: {
-		fontColor: OptionType;
-		fontSizeOption: OptionType;
-		fontFamilyOption: OptionType;
-	};
-	pageOptions: {
-		contentWidthArr: OptionType;
-		backgroundColor: OptionType;
-	};
-	handleBackColor: (e: OptionType) => void;
-	handleClear: (e?: any) => void;
-	handleContentWidth: (e: OptionType) => void;
-	handleFontColor: (e: OptionType) => void;
-	handleFontFamily: (e: OptionType) => void;
-	handleFontSize: (e: OptionType) => void;
-	handleOpen: (isOpened: boolean) => void;
-	isOpened: boolean;
-	handleFormData: (e?: any) => void;
+	setPageData: Dispatch<
+		SetStateAction<{
+			fontColor: OptionType;
+			fontSizeOption: OptionType;
+			fontFamilyOption: OptionType;
+			contentWidthArr: OptionType;
+			backgroundColor: OptionType;
+		}>
+	>;
 };
-export const ArticleParamsForm = ({
-	fontOptions,
-	pageOptions,
-	handleBackColor,
-	handleClear,
-	handleContentWidth,
-	handleFontColor,
-	handleFontFamily,
-	handleFontSize,
-	handleOpen,
-	isOpened,
-	handleFormData,
-}: formProps) => {
+export const ArticleParamsForm = ({ setPageData }: formProps) => {
+	const [isOpened, setOpened] = useState(false);
+	const [formData, setFormData] = useState({
+		fontColor: defaultArticleState.fontColor,
+		fontSizeOption: defaultArticleState.fontSizeOption,
+		fontFamilyOption: defaultArticleState.fontFamilyOption,
+		contentWidthArr: defaultArticleState.contentWidth,
+		backgroundColor: defaultArticleState.backgroundColor,
+	});
+	const openForm = () => setOpened(true);
+	const closeForm = () => setOpened(false);
+	function handleOpen() {
+		if (isOpened) {
+			closeForm();
+		} else {
+			openForm();
+		}
+	}
+	function handleFontColor(event: OptionType) {
+		setFormData({ ...formData, fontColor: event });
+	}
+	function handleFontSize(event: OptionType) {
+		setFormData({ ...formData, fontSizeOption: event });
+	}
+	function handleFontFamily(event: OptionType) {
+		setFormData({ ...formData, fontFamilyOption: event });
+	}
+	function handleBackColor(event: OptionType) {
+		setFormData({ ...formData, backgroundColor: event });
+	}
+	function handleContentWidth(event: OptionType) {
+		setFormData({ ...formData, contentWidthArr: event });
+	}
+	function handleFormData(e: FormEvent) {
+		e.preventDefault();
+		setPageData({
+			fontColor: formData.fontColor,
+			fontSizeOption: formData.fontSizeOption,
+			fontFamilyOption: formData.fontFamilyOption,
+			backgroundColor: formData.backgroundColor,
+			contentWidthArr: formData.contentWidthArr,
+		});
+	}
+	function handleClear(e: FormEvent) {
+		e.preventDefault();
+		setPageData({
+			fontColor: defaultArticleState.fontColor,
+			fontFamilyOption: defaultArticleState.fontFamilyOption,
+			fontSizeOption: defaultArticleState.fontSizeOption,
+			backgroundColor: defaultArticleState.backgroundColor,
+			contentWidthArr: defaultArticleState.contentWidth,
+		});
+		setFormData({
+			fontColor: defaultArticleState.fontColor,
+			fontSizeOption: defaultArticleState.fontSizeOption,
+			fontFamilyOption: defaultArticleState.fontFamilyOption,
+			backgroundColor: defaultArticleState.backgroundColor,
+			contentWidthArr: defaultArticleState.contentWidth,
+		});
+	}
 	return (
 		<>
 			<ArrowButton onClick={handleOpen} isOpened={isOpened} />
+			<div
+				onClick={() => setOpened(false)}
+				className={clsx(styles.overlay, isOpened && styles.overlay_open)}></div>
 			<aside
 				className={`${
 					isOpened
 						? styles.container + ' ' + styles.container_open
 						: styles.container
 				}`}>
-				<form className={styles.form}>
+				<form
+					className={styles.form}
+					onReset={handleClear}
+					onSubmit={handleFormData}>
 					<Text size={31} uppercase weight={800}>
 						задайте параметры
 					</Text>
 					<Select
-						selected={fontOptions.fontFamilyOption}
+						selected={formData.fontFamilyOption}
 						options={fontFamilyOptions}
 						title='шрифт'
 						onChange={handleFontFamily}
 						placeholder={defaultArticleState.fontFamilyOption.title}
 					/>
 					<RadioGroup
-						selected={fontOptions.fontSizeOption}
+						selected={formData.fontSizeOption}
 						options={fontSizeOptions}
 						title='размер шрифта'
 						onChange={handleFontSize}
 						name='размер шрифта'
 					/>
 					<Select
-						selected={fontOptions.fontColor}
+						selected={formData.fontColor}
 						options={fontColors}
 						title='цвет шрифта'
 						onChange={handleFontColor}
@@ -84,22 +130,22 @@ export const ArticleParamsForm = ({
 					/>
 					<Separator />
 					<Select
-						selected={pageOptions.backgroundColor}
+						selected={formData.backgroundColor}
 						options={backgroundColors}
 						title='цвет фона'
 						onChange={handleBackColor}
 						placeholder={defaultArticleState.backgroundColor.title}
 					/>
 					<Select
-						selected={pageOptions.contentWidthArr}
+						selected={formData.contentWidthArr}
 						options={contentWidthArr}
 						title='ширина контента'
 						onChange={handleContentWidth}
 						placeholder={defaultArticleState.contentWidth.title}
 					/>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' type='reset' onClick={handleClear} />
-						<Button title='Применить' type='submit' onClick={handleFormData} />
+						<Button title='Сбросить' type='reset' />
+						<Button title='Применить' type='submit' />
 					</div>
 				</form>
 			</aside>
